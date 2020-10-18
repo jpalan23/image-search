@@ -1,5 +1,5 @@
 <template>
-  <div class="search-bar">
+  <div :class="results.length > 0 ? 'search-bar focus top-fixed' : 'search-bar'">
       <div class="search-image">
           <img src="@/assets/img/image_icon.png" alt="search-image">
       </div>
@@ -8,17 +8,19 @@
           <h5>Search Image</h5>
           <input v-model="query" @keyup.enter="searchForImage()" @focus="addClassToParentDiv($event)" @blur="removeClassFromDiv($event)" type="text" />
       </div>
-      <div class="icon">
+      <div class="icon" @click="searchForImage()">
           <i class="fas fa-search"></i>
       </div>
-      <div class="icon">
-          <i class="fas fa-window-close"></i>
+      <div class="icon" >
+          <i @click="clearSearch($event)" class="fas fa-window-close"></i>
       </div>
   </div>
 </template>
 
 <script>
 import { fetchResults } from '../service/searchService';
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
     name: 'SearchBar',
     data() {
@@ -26,7 +28,15 @@ export default {
             query:''
         }
     },
+      computed: {
+        ...mapGetters([
+        'results'
+        ])
+    },
     methods: {
+         ...mapActions([
+             'resetSearch'
+         ]),
         addClassToParentDiv($event) {
             let parent = $event.target.parentNode.parentNode;
             parent.classList.add('focus')
@@ -39,7 +49,17 @@ export default {
         },
         searchForImage: async function(){
             if(this.query.trim().length > 0){
+                this.$parent.viewImage = false;
                 await fetchResults(this.query);
+            }
+        },
+        clearSearch($event){
+            console.log($event);
+            if(this.query.trim().length > 0){
+                this.query = '';
+                this.resetSearch();
+                $event.target.value = '';
+                this.removeClassFromDiv($event);
             }
         }
     },
@@ -48,13 +68,13 @@ export default {
 
 <style  lang="scss">
 .search-bar{
-    width: 100%;
+    width: 80%;
     position: relative;
     display: grid;
-    grid-template-columns: 50px auto 40px  40px;
+    grid-template-columns: 70px auto 40px  40px;
     margin: 25px 0;
     padding: 5px 0;
-    border: 2px solid var(--main-color);
+    border-bottom: 2px solid var(--main-color);
     
     &::before {
         right: 50%;
@@ -125,10 +145,17 @@ export default {
         font-size: 15px;
         background: #fff;
         z-index: 25;
+        display: none;
     }
 
     .icon {
         color: var(--secondary-color);
     }
+}
+
+.search-bar.top-fixed{
+    position: sticky;
+    top: 20px;
+    background: white;
 }
 </style>
