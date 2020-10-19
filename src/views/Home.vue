@@ -1,8 +1,8 @@
 <template>
   <div :class="results.length > 0 ?'home height-fix' : 'home'">
     <SearchBar/>
-    <InfoBoard v-if="noResultsFound || errorInSearch" />
-    <Results v-if="results.length > 0 && !viewImage" />
+    <ResultsView v-if="results.length > 0 && !viewImage" />
+    <InfoBoard v-if="noResultsFound || errorInSearch || isLoading" />
     <ViewImage :image="selectedImage" v-if="viewImage" />
   </div>
 </template>
@@ -11,7 +11,7 @@
 // @ is an alias to /src
 import SearchBar from '@/components/SearchBar.vue'
 import InfoBoard from '@/components/InfoBoard.vue'
-import Results from '@/components/Results.vue'
+import ResultsView from '@/components/Results.vue'
 import ViewImage from '@/components/ViewImage.vue'
 import { mapGetters } from 'vuex';
 
@@ -20,7 +20,7 @@ export default {
   components: {
     SearchBar,
     InfoBoard,
-    Results,
+    ResultsView,
     ViewImage
   },
   data() {
@@ -33,7 +33,8 @@ export default {
     ...mapGetters([
       'errorInSearch',
       'noResultsFound',
-      'results'
+      'results',
+      'isLoading'
     ])
   },
 }

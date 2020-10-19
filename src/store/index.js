@@ -8,11 +8,11 @@ export default new Vuex.Store({
     errorInResultSearch: false,
     results: [],
     page: 1,
-    nextResult: [],
     apiUrl: `https://api.imgur.com/3/gallery/search/`,
     credentials: `Client-ID b067d5cb828ec5a`,
     query: '',
     lastPage: false,
+    isLoading:false,
   },
   getters: {
     results: state => {
@@ -29,13 +29,13 @@ export default new Vuex.Store({
     },
     lastPage: state => {
       return state.lastPage
+    },
+    isLoading: state =>{
+      return state.isLoading
     }
   },
   mutations: {
     initializeData(state, dataArray) {
-
-      // const results = getData();
-      console.log(dataArray);
       state.results = dataArray;
       state.errorInResultSearch = false;
       state.noResultsFound = false;
@@ -44,15 +44,30 @@ export default new Vuex.Store({
     },
     changeErrorInSearchField(state) {
       state.errorInResultSearch = true;
+      state.isLoading = false;
+      state.lastPage = true;
     },
+    changeLoadingValue(state, val){
+      if(val == 1){
+        state.isLoading = true;
+      }else{
+        state.isLoading = false;
+      }
+    },  
     updateNoResultsField(state) {
       state.noResultsFound = true;
+      state.isLoading = false;
     },
     initializeQueryField(state, query) {
       state.query = query;
     },
     addMoreData(state, data) {
-      state.results.concat(data);
+      const results = state.results;
+      const mergetResuls = [...results,...data];
+      state.results= mergetResuls;
+    },
+    incrementCurrentPage(state){
+      state.page = state.page + 1;
     },
     updateLastPage(state) {
       state.lastPage = true;
@@ -63,6 +78,7 @@ export default new Vuex.Store({
       state.noResultsFound = false;
       state.lastPage = false;
       state.page = 1;
+      state.isLoading = false;
     }
   },
   actions: {
@@ -81,25 +97,22 @@ export default new Vuex.Store({
           return acc;
         }, {}));
         const filterdData = reducedArray(dataArray).filter(img => img.type);
-        commit('initializeData', reducedArray(filterdData));
+        setTimeout(function(){ 
+          commit('initializeData', reducedArray(filterdData));
+          commit('changeLoadingValue',0);
+      }, 3000);
+        
       }
     },
-    storeMoreResults({
+    updatPageStatus({
       commit
     }, dataObj) {
       const dataArray = dataObj.data;
       if (dataArray.length == 0) {
         commit('updateLastPage');
       } else {
-        const keysToKeep = ['id', 'title', 'type', 'link'];
-        const reducedArray = dataArray => dataArray.map(o => keysToKeep.reduce((acc, curr) => {
-          acc[curr] = o[curr];
-          return acc;
-        }, {}));
-        const filterdData = reducedArray(dataArray).filter(img => img.type);
-        commit('addMoreData', filterdData);
+        commit('incrementCurrentPage');
       }
-
     },
     errorInResults({
       commit
@@ -108,6 +121,9 @@ export default new Vuex.Store({
     },
     resetSearch({commit}){
       commit('resetState');
+    },
+    updateLoadingField({commit},val){
+      commit('changeLoadingValue',val)
     }
   },
   modules: {}

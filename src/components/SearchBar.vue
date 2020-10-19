@@ -1,7 +1,7 @@
 <template>
-  <div :class="results.length > 0 ? 'search-bar focus top-fixed' : 'search-bar'">
+  <div :class="results.length > 0 ? 'search-bar focus top-fixed' : query.length > 0 ? 'search-bar focus' : 'search-bar' ">
       <div class="search-image">
-          <img src="@/assets/img/image_icon.png" alt="search-image">
+          <img src="../assets/img/image_icon.png" alt="search-image">
       </div>
       
       <div class="form-input">
@@ -49,6 +49,7 @@ export default {
         },
         searchForImage: async function(){
             if(this.query.trim().length > 0){
+                this.resetSearch();
                 this.$parent.viewImage = false;
                 await fetchResults(this.query);
             }
@@ -71,9 +72,10 @@ export default {
     width: 80%;
     position: relative;
     display: grid;
-    grid-template-columns: 70px auto 40px  40px;
-    margin: 25px 0;
-    padding: 5px 0;
+    grid-template-columns: 70px auto 40px 40px;
+    margin: 0;
+    padding-top: 30px;
+    padding-bottom: 5px;
     border-bottom: 2px solid var(--main-color);
     
     &::before {
@@ -145,7 +147,6 @@ export default {
         font-size: 15px;
         background: #fff;
         z-index: 25;
-        display: none;
     }
 
     .icon {
@@ -155,7 +156,7 @@ export default {
 
 .search-bar.top-fixed{
     position: sticky;
-    top: 20px;
+    top: 0px;
     background: white;
 }
 </style>

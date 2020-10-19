@@ -9,9 +9,9 @@ export function http() {
 }
 
 export function fetchResults(query) {
+    store.dispatch('updateLoadingField',1);
     return http().get(`top/all/1/?q=${query}`)
         .then(res => {
-            console.log(res)
             store.dispatch('storeResults', {
                 data: res.data.data,
                 query: query
@@ -20,21 +20,24 @@ export function fetchResults(query) {
         }).catch(err => {
             console.error(err);
             store.dispatch('errorInResults');
+            store.dispatch('updateLoadingField',0);
         });
 }
 
 export function loadMoreResults() {
     if (store.state.query.length > 0) {
+        store.dispatch('updateLoadingField',1);
         return http().get(`top/all/${store.state.page + 1}/?q=${store.state.query}`)
             .then(res => {
-                console.log(res)
-                store.dispatch('storeMoreResults', {
+                store.dispatch('updatPageStatus', {
                     data: res.data.data
                 });
+                store.dispatch('updateLoadingField',0);
                 return res;
             }).catch(err => {
                 console.error(err);
                 store.dispatch('errorInResults');
+                store.dispatch('updateLoadingField',0);
             });
     }
 }

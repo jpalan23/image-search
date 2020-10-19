@@ -1,7 +1,11 @@
 <template>
     <div class="view-image">
         <img :alt="image.title || ''" :src="image.link"/>
-        <span @click="goBack" class="btn"> Back </span>
+        <div class="action-btns">
+            <div @click="openImag" class="btn"> Open </div>
+            <div @click="goBack" class="btn"> Back </div>
+        </div>
+        
     </div>
   
 </template>
@@ -16,6 +20,13 @@ export default {
         goBack(){
             this.$parent.selectedImage = null;
             this.$parent.viewImage = false;
+        },
+        openImag(){
+            let link = document.createElement("a");
+            link.download = this.image.title.trim().replace(/\s/g, '');
+            link.href = this.image.link;
+            var win = window.open(link, '_blank');
+            win.focus();
         }
     },
 }
@@ -32,28 +43,20 @@ export default {
         img{
             max-width: 100%;
             max-height: 60vh;
-
         }
 
-        .btn{
-            display: block;
+        .action-btns{
+            display: flex;
             width: 100%;
-            max-width: 200px;
-            height: 50px;
-            border-radius: 25px;
-            outline: none;
-            border: none;
-            background-image: linear-gradient(to right, #6C63FF, #6C63EF, #6C63FF);
-            background-size: 200%;
-            font-size: 1.2rem;
-            color: #fff;
-            font-family: "Poppins", sans-serif;
-            text-transform: uppercase;
-            margin: 1rem 0;
-            cursor: pointer;
-            text-align: center;
-            line-height: 50px;
-            transition: 0.5s;
+            justify-content: sper;
+            max-width: 500px;
+            justify-content: space-around;
+        }
+
+        @media screen and (max-width: 768px){
+          .btn{
+              max-width: 140px;
+          }
         }
 }
 
